@@ -55,7 +55,7 @@ This document outlines the technical specifications for an advanced home constru
 
 #### Advanced Outputs (Market Differentiators)
 - **Quality-wise Material Options**: Basic/Standard/Premium for each material category
-- **Regional Price Variations**: ±10% adjustment based on location
+- **Regional Price Variations**: ±10% adjustment based on location with weekly admin updates
 - **Seasonal Pricing Impact**: Construction cost variations by season
 - **Contingency Planning**: 10-15% buffer with breakdown
 - **ROI Analysis**: For investment properties
@@ -73,7 +73,7 @@ This document outlines the technical specifications for an advanced home constru
 #### Material Database
 - **Material Categories**: 50+ materials with specifications
 - **Quality Grades**: 3 tiers per material type
-- **Vendor Integration**: Real-time price feeds (future scope)
+- **Vendor Integration**: Weekly price updates via admin portal and dealer network integration
 - **Wastage Factors**: Material-specific wastage percentages
 
 #### Labor Cost Management

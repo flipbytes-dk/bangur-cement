@@ -257,8 +257,11 @@ router.put('/pricing/:cityId', [authenticate, authorize('admin')], async (req, r
             req.user.id
         );
         
-        // Invalidate cache
+        // Invalidate cache for weekly update cycle
         await CacheService.invalidateRegionalPricing(req.params.cityId);
+        
+        // Schedule next weekly update reminder
+        await SchedulerService.scheduleNextPriceUpdate(req.params.cityId, 'weekly');
         
         res.json({ success: true, data: updates });
     } catch (error) {
@@ -434,9 +437,14 @@ class CacheService {
         return null;
     }
     
-    static async setRegionalPricing(stateCode, cityName, data, ttl = 3600) {
+    static async setRegionalPricing(stateCode, cityName, data, ttl = 604800) { // 7 days for weekly updates
         const key = `pricing:${stateCode}:${cityName}`;
-        await redis.setex(key, ttl, JSON.stringify(data));
+        const dataWithTimestamp = {
+            ...data,
+            cachedAt: new Date().toISOString(),
+            updateFrequency: 'weekly'
+        };
+        await redis.setex(key, ttl, JSON.stringify(dataWithTimestamp));
     }
     
     static async invalidateRegionalPricing(cityId) {

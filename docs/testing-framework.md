@@ -106,7 +106,8 @@ describe('Calculator API Integration', () => {
         expect(response.body.totalCost).toBeGreaterThan(0);
     });
     
-    test('should handle regional pricing', async () => {
+    test('should handle weekly regional pricing updates', async () => {
+        // Test with current week pricing
         const mumbaiInput = { plotArea: 1000, location: { state: 'MH', city: 'Mumbai' }};
         const puneInput = { plotArea: 1000, location: { state: 'MH', city: 'Pune' }};
         
@@ -117,6 +118,12 @@ describe('Calculator API Integration', () => {
         
         // Mumbai should be more expensive than Pune
         expect(mumbaiResponse.body.totalCost).toBeGreaterThan(puneResponse.body.totalCost);
+        
+        // Verify pricing data freshness (within 7 days)
+        expect(mumbaiResponse.body.pricingData.lastUpdated).toBeDefined();
+        const lastUpdate = new Date(mumbaiResponse.body.pricingData.lastUpdated);
+        const daysSinceUpdate = (Date.now() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24);
+        expect(daysSinceUpdate).toBeLessThan(7); // Updated within a week
     });
 });
 ```
@@ -124,14 +131,25 @@ describe('Calculator API Integration', () => {
 #### Database Integration Tests
 ```javascript
 describe('Configuration Management', () => {
-    test('should update regional pricing dynamically', async () => {
+    test('should update regional pricing weekly', async () => {
         const originalPrice = await getPricingFactor('MH', 'Pune', 'cement');
         
-        await updatePricingFactor('MH', 'Pune', 'cement', 1.15);
+        // Simulate weekly admin update
+        await updatePricingFactor('MH', 'Pune', 'cement', 1.15, {
+            updateType: 'weekly_admin_update',
+            approvedBy: 'regional_manager_pune',
+            effectiveDate: new Date().toISOString()
+        });
+        
         const updatedPrice = await getPricingFactor('MH', 'Pune', 'cement');
         
         expect(updatedPrice).toBe(1.15);
         expect(updatedPrice).not.toBe(originalPrice);
+        
+        // Verify update metadata
+        const updateHistory = await getPricingUpdateHistory('MH', 'Pune', 'cement');
+        expect(updateHistory.latest.updateType).toBe('weekly_admin_update');
+        expect(updateHistory.latest.approvedBy).toBe('regional_manager_pune');
     });
     
     test('should maintain data consistency during updates', async () => {

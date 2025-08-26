@@ -349,7 +349,7 @@ Authorization: Bearer [jwt-token] (for admin endpoints)
 
 **Authentication:** Required (Admin role)
 
-**Description:** Retrieves all regional pricing data.
+**Description:** Retrieves all regional pricing data with weekly update cycles.
 
 #### Response
 ```json
@@ -375,7 +375,9 @@ Authorization: Bearer [jwt-token] (for admin endpoints)
               "semiskilled": 1.30,
               "unskilled": 1.25
             },
-            "lastUpdated": "2025-08-20T12:00:00Z"
+            "lastUpdated": "2025-08-20T12:00:00Z",
+            "updateFrequency": "weekly",
+            "nextScheduledUpdate": "2025-08-27T09:00:00Z"
           }
         ]
       }
@@ -404,7 +406,9 @@ Authorization: Bearer [jwt-token] (for admin endpoints)
     "unskilled": 1.28
   },
   "effectiveDate": "2025-08-26T00:00:00Z",
-  "reason": "Market price increase due to monsoon season"
+  "reason": "Weekly market price adjustment based on regional sales data",
+  "updateFrequency": "weekly",
+  "approvalWorkflow": "regional_manager_approval"
 }
 ```
 
@@ -580,8 +584,8 @@ Authorization: Bearer [jwt-token] (for admin endpoints)
 
 ### 5.1 Default Limits
 - **Calculator API**: 100 requests per hour per IP
-- **Admin API**: 1000 requests per hour per authenticated user
-- **Bulk operations**: 10 requests per hour per authenticated user
+- **Admin API**: 500 requests per hour per authenticated user (suitable for weekly update cycles)
+- **Bulk operations**: 5 requests per hour per authenticated user
 
 ### 5.2 Headers
 Response includes rate limit information:
